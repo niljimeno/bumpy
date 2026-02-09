@@ -1,3 +1,4 @@
+world = require("world")
 player = require("player")
 
 state = {
@@ -5,6 +6,7 @@ state = {
 }
 
 function love.load()
+    world.load()
     state.player = player.new()
 end
 
@@ -13,5 +15,6 @@ function love.update(dt)
 end
 
 function love.draw()
+    world.draw()
     player.draw(state.player)
 end
