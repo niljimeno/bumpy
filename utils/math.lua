@@ -4,23 +4,41 @@ function vector(x, y)
     x = x or 0
     y = y or 0
     add = function(self, vec)
-	self.x = self.x + vec.x
-	self.y = self.y + vec.y
+	return vector(
+	    self.x + vec.x,
+	    self.y + vec.y)
     end
-    
+
+    sub = function(self, vec)
+	return vector(
+	    self.x - vec.x,
+	    self.y - vec.y)
+    end
+	
+    scale = function(self, val)
+	return vector(
+	    self.x * val,
+	    self.y * val)
+    end
+
     return {
 	x=x,
 	y=y,
-	add=add
+	add=add,
+	sub=sub,
+	scale=scale
     }
 end
 
-function degreeToVector(deg, scale)
-    scale = scale or 1
+function degreeToVector(deg)
     return vector(
-	math.sin(deg) * scale,
-	math.cos(deg) * scale
+	math.cos(math.rad(deg)),
+	math.sin(math.rad(deg))
     )
+end
+
+function vectorToDegree(vec)
+    math.atan2(vec.x, vec.y)
 end
 
 function lerp(a, b, t)
