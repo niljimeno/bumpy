@@ -8,7 +8,22 @@ function vector(x, y)
     }
 end
 
+function lerp(a, b, t)
+    return a - (a - b) * t
+end
+
+function clamp(value, min, max)
+    if value < min then
+        return min
+    elseif value > max then
+        return max
+    else
+        return value
+    end
+end
+
 return {
     vector = vector,
+    lerp = lerp,
+    clamp = clamp
 }
-
