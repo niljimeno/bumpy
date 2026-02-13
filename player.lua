@@ -21,22 +21,21 @@ function newPlayer()
 end
 
 function accelerate(dt, player)
-    local change = player.speed
-    player.velocity = player.velocity:add(
-	degreeToVector(
-	    player.direction
-	):scale(change * dt))
+    local change = player.speed * dt
+    local directionVector = degreeToVector(player.direction)
+    player.velocity.x = player.velocity.x + directionVector.x * change
+    player.velocity.y = player.velocity.y + directionVector.y * change
 end
 
 function decelerate(dt, player)
     local change = player.speed * 2
-    player.velocity = player.velocity:sub(
-	player.velocity:scale(dt*5))
+    player.velocity.x = player.velocity.x - player.velocity.x * (dt*5)
+    player.velocity.y = player.velocity.y - player.velocity.y * (dt*5)
 end
 
 function move(dt, player)
-    player.position = player.position:add(
-	player.velocity:scale(dt))
+    player.position.x = player.position.x + player.velocity.x * dt
+    player.position.y = player.position.y + player.velocity.y * dt
 end
 
 function spin(dt, player)
