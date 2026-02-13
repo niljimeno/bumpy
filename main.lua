@@ -9,7 +9,6 @@ state = {
 function love.load()
     world.load()
     state.player = player.new()
-    background.load()
 end
 
 function love.update(dt)

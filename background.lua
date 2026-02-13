@@ -5,10 +5,6 @@ local background_image
 local gridPos = 0
 local squareSize = 60
 
-function Background.load()
-    background_image = love.graphics.newImage("assets/background.png")
-end
-
 function Background.update(dt)
     gridPos = gridPos + dt * 10
     if gridPos >= squareSize then
