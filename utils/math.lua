@@ -3,30 +3,10 @@ local math = require "math"
 function vector(x, y)
     x = x or 0
     y = y or 0
-    add = function(self, vec)
-	return vector(
-	    self.x + vec.x,
-	    self.y + vec.y)
-    end
-
-    sub = function(self, vec)
-	return vector(
-	    self.x - vec.x,
-	    self.y - vec.y)
-    end
-	
-    scale = function(self, val)
-	return vector(
-	    self.x * val,
-	    self.y * val)
-    end
 
     return {
 	x=x,
 	y=y,
-	add=add,
-	sub=sub,
-	scale=scale
     }
 end
 
