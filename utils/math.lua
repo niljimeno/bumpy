@@ -18,7 +18,16 @@ function degreeToVector(deg)
 end
 
 function vectorToDegree(vec)
-    math.atan2(vec.x, vec.y)
+    return math.deg(math.atan2(vec.x, vec.y))
+end
+
+function distance(vec1, vec2)
+    diff = {
+	x = vec1.x - vec2.x,
+	y = vec1.y - vec2.y,
+    }
+
+    return math.sqrt(diff.x^2 + diff.y^2)
 end
 
 function lerp(a, b, t)
