@@ -2,22 +2,18 @@ world = require("world")
 player = require("player")
 background = require("background")
 
-state = {
-    player = {}
-}
-
 function love.load()
     world.load()
-    state.player = player.new()
+    player.init()    
 end
 
 function love.update(dt)
     background.update(dt)
-    player.update(dt, state.player)
+    player.update(dt)
 end
 
 function love.draw()
     background.draw()
     world.draw()
-    player.draw(state.player)
+    player.draw()
 end
