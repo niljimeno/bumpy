@@ -5,7 +5,6 @@ local State = {
     Waiting = 1,
     Running = 2,
 }
-    
 
 function newPlayer()
     local instance = {
@@ -39,12 +38,9 @@ function move(dt, player)
 end
 
 function spin(dt, player)
-    change = 180
+    local change = 180
     player.direction = (player.direction + change*dt) % 360
 end 
-
-function clampSpeed(player)
-end
 
 function updatePlayer(dt, player)
     if (player.state == state.Frozen) then
@@ -61,13 +57,40 @@ function updatePlayer(dt, player)
 	spin(dt, player)
     end
 
-    clampSpeed(player)
     move(dt, player)
 end
 
+function drawWheel(player)
+    local vecDir = degreeToVector(player.direction)
+    local distance = 35
+    
+    local trianglePosition = {
+	x = player.position.x + vecDir.x * distance,
+	y = player.position.y + vecDir.y * distance
+    }
+
+    local vecB = degreeToVector(player.direction+120)
+    local vecC = degreeToVector(player.direction+240)
+
+    local wheelDiameter = 10
+
+    love.graphics.setColor(1, 0.8, 0.4, 1, true, true)
+    love.graphics.polygon(
+	"fill",
+	trianglePosition.x + vecDir.x*wheelDiameter/2,
+	trianglePosition.y + vecDir.y*wheelDiameter/2,
+	trianglePosition.x + vecB.x*wheelDiameter,
+	trianglePosition.y + vecB.y*wheelDiameter,
+	trianglePosition.x + vecC.x*wheelDiameter,
+	trianglePosition.y + vecC.y*wheelDiameter)
+end
 
 function drawPlayer(player)
     love.graphics.circle("fill", player.position.x, player.position.y, 20)
+
+    if player.state == State.Waiting then
+	drawWheel(player)
+    end
 end
 
 return {
