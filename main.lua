@@ -3,6 +3,13 @@ player = require("player")
 background = require("background")
 
 function love.load()
+    local screenWidth, screenHeight = love.window.getDesktopDimensions(1)
+
+    love.window.setMode(screenWidth, screenHeight, {
+        fullscreen = true, 
+        vsync = true
+    })
+
     world.load()
     player.init()    
 end
