@@ -45,13 +45,6 @@ function accelerate(dt, player)
     local degDiff = luaMath.abs(
 	(vectorToDegree(player.velocity) % 360) -
 	(player.direction % 360))
-    if degDiff > 90 and degDiff < 270 then
-	print("what the fuck", vectorToDegree(player.velocity), player.direction,
-	      luaMath.abs(
-		  (vectorToDegree(player.velocity) % 360) -
-		  (player.direction % 360)))
-	-- decelerate(dt, player)
-    end
 
     player.velocity.x = player.velocity.x + directionVector.x * change
     player.velocity.y = player.velocity.y + directionVector.y * change
@@ -89,16 +82,56 @@ function areColliding(a, b)
     return distance(a.position, b.position) < (a.size + b.size)
 end
 
-function collide(p, p2)
-    local elasticity = 0.4
-    velocityP = {
-	x = p2.velocity.x - p.velocity.x * elasticity,
-	y = p2.velocity.y - p.velocity.y * elasticity,
+function newVelocity(a, b)
+    local vecDiff = {
+	    x = a.position.x - b.position.x,
+	    y = a.position.y - b.position.y,
     }
-    p2.velocity.x = p.velocity.x - p2.velocity.x * elasticity
-    p2.velocity.y = p.velocity.y - p2.velocity.y * elasticity
 
-    p.velocity = velocityP
+    print("I am", a.position.x, a.position.y, "He is", b.position.x, b.position.y)
+
+    local collisionAngle = math.vectorToDegree(vecDiff)
+    local bVelocityDirection = vectorToDegree(b.velocity)
+    local bStrength = math.hypotenusa(b.velocity)
+    local bHitAngleDiff = math.angleDiff(collisionAngle, bVelocityDirection)
+    local bHitStrength = luaMath.cos(luaMath.rad(bHitAngleDiff)) * bStrength
+    local bHitAngle = collisionAngle % 360
+    local bHitVector = degreeToVector(bHitAngle)
+
+    print("New things", "vel dir", bVelocityDirection, "strength", bStrength, "hit angle diff", bHitAngleDiff, "hitStrength", bHitStrength, "p2 hit angle", bHitAngle, "p2 hit vector", bHitVector.x, bHitVector.y)
+
+    return {
+     	x = bHitVector.x * bHitStrength,
+     	y = bHitVector.y * bHitStrength,
+    }
+
+    -- return b.velocity
+end
+
+function collide(p, p2)
+    local vecDiff = {
+	x = p2.position.x - p.position.x,
+	y = p2.position.y - p.position.y,
+    }
+    local collisionAngle = math.vectorToDegree(vecDiff)
+    local remainingDistance = distance(p.position, p2.position) - (p.size + p2.size)
+    
+    -- if remainingDistance < 1 then
+    -- 	remainingDistance = 2
+    -- end
+    
+    -- local cos = luaMath.cos(collisionAngle)
+    -- local sin = luaMath.sin(collisionAngle)
+
+    pNew = newVelocity(p, p2)
+    p2New = newVelocity(p2, p)
+
+    local dirVec = degreeToVector(collisionAngle)
+    p.position.x = p.position.x + dirVec.x * remainingDistance
+    p.position.y = p.position.y + dirVec.y * remainingDistance
+    
+    p.velocity = pNew
+    p2.velocity = p2New
 end
 
 function update(dt)
