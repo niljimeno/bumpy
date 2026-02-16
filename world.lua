@@ -1,20 +1,24 @@
 local uMath = require("utils.math")
+local camera = require("camera")
 local World = {}
 
 local tilemap
 local tileset
 local quads = {}
 local width, height
-local gameWidth, gameHeight
-local mapWidthOffset, mapHeightOffset
+
+local spawnPoint = {
+    {x = 128, y = 128},
+    {x = 512, y = 512}
+}
+
+local mapLimits = {
+    min = 0,
+    max = 640
+}
 
 function World.load()
-    gameWidth, gameHeight = love.graphics.getDimensions()
     tilemap = love.graphics.newImage("assets/map.png")
-    World.mapLimits = {
-        min = 0,
-        max = 1280
-    }
 
     local mapHeight = tilemap:getHeight()
     local mapWidth = tilemap:getWidth()
@@ -50,30 +54,42 @@ function World.load()
         {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
     }
 
-    mapHeightOffset = (gameHeight - #tileset[1] * height) / 2
-    mapWidthOffset = (gameWidth - #tileset[1] * width) / 2
+    
 end
 
 function World.draw()
+    local offsetX, offsetY = camera.positionToScreen(0, 0)
     for i, row in ipairs(tileset) do
         for j, tile in ipairs(row) do
             love.graphics.draw(
                 tilemap,
                 quads[tile],
-                mapWidthOffset + (j - 1) * width,
-                mapHeightOffset + (i - 1) * height
+                offsetX + (j - 1) * width,
+                offsetY + (i - 1) * height
             )
         end
     end
 end
 
 function World.isOnFloor(x, y)
-    if x <= World.mapLimits.min then return false end
-    if x >= World.mapLimits.max then return false end
-    if y <= World.mapLimits.min then return false end
-    if y >= World.mapLimits.max then return false end
+    if x <= mapLimits.min then return false end
+    if x >= mapLimits.max then return false end
+    if y <= mapLimits.min then return false end
+    if y >= mappLimits.max then return false end
 
     return true
+end
+
+function World.getPositionWidth()
+    return #tileset[1] * width
+end
+
+function World.getPositionHeight()
+    return #tileset[1] * height
+end
+
+function World.getSpawnPoint(index)
+    return spawnPoint[index]
 end
 
 return World

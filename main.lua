@@ -1,5 +1,6 @@
 world = require("world")
 player = require("player")
+camera = require("camera")
 background = require("background")
 
 function love.load()
@@ -11,7 +12,8 @@ function love.load()
     })
 
     world.load()
-    player.init()    
+    player.init()
+    camera.centerOnWorld(world)
 end
 
 function love.update(dt)
