@@ -75,7 +75,7 @@ function World.isOnFloor(x, y)
     if x <= mapLimits.min then return false end
     if x >= mapLimits.max then return false end
     if y <= mapLimits.min then return false end
-    if y >= mappLimits.max then return false end
+    if y >= mapLimits.max then return false end
 
     return true
 end
