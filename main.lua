@@ -18,6 +18,7 @@ end
 
 function love.update(dt)
     background.update(dt)
+    camera.update(dt)
     player.update(dt)
 end
 
