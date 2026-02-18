@@ -8,8 +8,16 @@ local quads = {}
 local width, height
 
 local spawnPoint = {
-    {x = 128, y = 128},
-    {x = 512, y = 512}
+    {x = 128, y = 128, dir = 45 },
+    {x = 512, y = 512, dir = 225},
+    {x = 512, y = 128, dir = 135},
+    {x = 128, y = 512, dir = 315},
+}
+
+local spawnPointAlt = { -- FOR 3 PLAYERS
+    {x = 320, y = 128, dir = 90 },
+    {x = 512, y = 512, dir = 225},
+    {x = 128, y = 512, dir = 315},
 }
 
 local mapLimits = {
@@ -80,16 +88,23 @@ function World.isOnFloor(x, y)
     return true
 end
 
-function World.getPositionWidth()
-    return #tileset[1] * width
+function World.setMapLimits(playerSize)
+    mapLimits.min = mapLimits.min - playerSize
+    mapLimits.max = mapLimits.max + playerSize
 end
 
-function World.getPositionHeight()
-    return #tileset[1] * height
+function World.getMapDimentions()
+    return #tileset[1] * width, #tileset[1] * height
 end
 
-function World.getSpawnPoint(index)
-    return spawnPoint[index]
+function World.getSpawnPoint(index, alt)
+    alt = alt or false
+
+    if not alt then
+        return spawnPoint[index]
+    else
+        return spawnPointAlt[index]
+    end
 end
 
 return World

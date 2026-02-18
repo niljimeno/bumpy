@@ -34,16 +34,16 @@ end
 
 function Camera.centerOnWorld(world)
     gameWidth, gameHeight = love.graphics.getDimensions()
+    local mapWidth, mapHeight = world.getMapDimentions()
     
-    BASE_OFFSET_Y = (gameHeight - world.getPositionHeight()) / 2
-    BASE_OFFSET_X = (gameWidth - world.getPositionWidth()) / 2
+    BASE_OFFSET_Y = (gameHeight - mapHeight) / 2
+    BASE_OFFSET_X = (gameWidth - mapWidth) / 2
 
     screenOffsetY = BASE_OFFSET_Y
     screenOffsetX = BASE_OFFSET_X
 end
 
 function Camera.screenShake(d, w, s)
-    print("SET SCREENSHAKE")
     time = love.math.random(0, 100)
     startDuration = d
     duration = d
