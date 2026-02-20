@@ -34,7 +34,8 @@ function init()
 end
 
 function decelerate(dt, player)
-    local change = 5 * dt
+    local decreaseScale = 4
+    local change = decreaseScale * dt
     player.velocity.x = player.velocity.x - player.velocity.x * change
     player.velocity.y = player.velocity.y - player.velocity.y * change
 end
@@ -90,18 +91,21 @@ function newVelocity(a, b)
 
 
     local collisionAngle = math.vectorToDegree(vecDiff)
-    local bVelocityDirection = vectorToDegree(b.velocity)
-    local bStrength = math.hypotenusa(b.velocity)
-    local bHitAngleDiff = math.angleDiff(collisionAngle, bVelocityDirection)
-    local bHitStrength = luaMath.cos(luaMath.rad(bHitAngleDiff)) * bStrength
-    local bHitAngle = collisionAngle % 360
-    local bHitVector = degreeToVector(bHitAngle)
+    local hitVelocity = {
+	x = b.velocity.x - a.velocity.x,
+	y = b.velocity.y - a.velocity.y,
+    }
+    local hitVelocityDirection = vectorToDegree(hitVelocity)
+    local hitStrength = math.hypotenusa(hitVelocity)
+    local hitAngleDiff = math.angleDiff(collisionAngle, hitVelocityDirection)
+    local hitStrength = luaMath.cos(luaMath.rad(hitAngleDiff)) * hitStrength
+    local hitVector = degreeToVector(collisionAngle)
 
     -- print("New things", "vel dir", bVelocityDirection, "strength", bStrength, "hit angle diff", bHitAngleDiff, "hitStrength", bHitStrength, "p2 hit angle", bHitAngle, "p2 hit vector", bHitVector.x, bHitVector.y)
 
     return {
-     	x = bHitVector.x * bHitStrength,
-     	y = bHitVector.y * bHitStrength,
+     	x = a.velocity.x + hitVector.x * hitStrength,
+     	y = a.velocity.y + hitVector.y * hitStrength,
     }
 end
 
