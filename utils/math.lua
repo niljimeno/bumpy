@@ -12,11 +12,12 @@ end
 
 function degreeToVector(deg)
     return vector(
-	math.cos(math.rad(deg)),
-	math.sin(math.rad(deg))
+	math.sin(math.rad(deg)),
+	math.cos(math.rad(deg))
     )
 end
 
+-- this only works in one direction
 function vectorToDegree(vec)
     return math.deg(math.atan2(vec.x, vec.y))
 end

@@ -84,11 +84,10 @@ end
 
 function newVelocity(a, b)
     local vecDiff = {
-	    x = a.position.x - b.position.x,
-	    y = a.position.y - b.position.y,
+	    x = b.position.x - a.position.x,
+	    y = b.position.y - a.position.y,
     }
 
-    print("I am", a.position.x, a.position.y, "He is", b.position.x, b.position.y)
 
     local collisionAngle = math.vectorToDegree(vecDiff)
     local bVelocityDirection = vectorToDegree(b.velocity)
@@ -98,14 +97,12 @@ function newVelocity(a, b)
     local bHitAngle = collisionAngle % 360
     local bHitVector = degreeToVector(bHitAngle)
 
-    print("New things", "vel dir", bVelocityDirection, "strength", bStrength, "hit angle diff", bHitAngleDiff, "hitStrength", bHitStrength, "p2 hit angle", bHitAngle, "p2 hit vector", bHitVector.x, bHitVector.y)
+    -- print("New things", "vel dir", bVelocityDirection, "strength", bStrength, "hit angle diff", bHitAngleDiff, "hitStrength", bHitStrength, "p2 hit angle", bHitAngle, "p2 hit vector", bHitVector.x, bHitVector.y)
 
     return {
      	x = bHitVector.x * bHitStrength,
      	y = bHitVector.y * bHitStrength,
     }
-
-    -- return b.velocity
 end
 
 function collide(p, p2)
@@ -113,23 +110,15 @@ function collide(p, p2)
 	x = p2.position.x - p.position.x,
 	y = p2.position.y - p.position.y,
     }
-    local collisionAngle = math.vectorToDegree(vecDiff)
-    local remainingDistance = distance(p.position, p2.position) - (p.size + p2.size)
+    local collisionAngle = ( math.vectorToDegree(vecDiff) + 180 ) % 360
+    local dirVec = degreeToVector(collisionAngle)
     
-    -- if remainingDistance < 1 then
-    -- 	remainingDistance = 2
-    -- end
-    
-    -- local cos = luaMath.cos(collisionAngle)
-    -- local sin = luaMath.sin(collisionAngle)
-
     pNew = newVelocity(p, p2)
     p2New = newVelocity(p2, p)
 
-    local dirVec = degreeToVector(collisionAngle)
-    p.position.x = p.position.x + dirVec.x * remainingDistance
-    p.position.y = p.position.y + dirVec.y * remainingDistance
-    
+    p.position.x = p2.position.x + dirVec.x * (p.size + p2.size)
+    p.position.y = p2.position.y + dirVec.y * (p.size + p2.size)
+   
     p.velocity = pNew
     p2.velocity = p2New
 end
