@@ -14,7 +14,7 @@ function newPlayer(key, x, y)
 	speed = 2000,
 	key = key,
 	size = 20,
-	
+
 	state = State.Waiting,
 	position = math.vector(x, y),
 	velocity = math.vector(),
@@ -24,7 +24,7 @@ function newPlayer(key, x, y)
 	-- temporaries
 	hasCollided = false,
     }
-    
+
     return instance
 end
 
@@ -43,9 +43,6 @@ end
 function accelerate(dt, player)
     local change = player.speed * dt
     local directionVector = degreeToVector(player.direction)
-    local degDiff = luaMath.abs(
-	(vectorToDegree(player.velocity) % 360) -
-	(player.direction % 360))
 
     player.velocity.x = player.velocity.x + directionVector.x * change
     player.velocity.y = player.velocity.y + directionVector.y * change
@@ -59,7 +56,7 @@ end
 function spin(dt, player)
     local change = 180
     player.direction = (player.direction + change*dt) % 360
-end 
+end
 
 function updatePlayer(dt, player)
     if (player.state == State.Frozen) then
@@ -104,8 +101,8 @@ function newVelocity(a, b)
     -- print("New things", "vel dir", bVelocityDirection, "strength", bStrength, "hit angle diff", bHitAngleDiff, "hitStrength", bHitStrength, "p2 hit angle", bHitAngle, "p2 hit vector", bHitVector.x, bHitVector.y)
 
     return {
-     	x = a.velocity.x + hitVector.x * hitStrength,
-     	y = a.velocity.y + hitVector.y * hitStrength,
+     	x = a.velocity.x / 2 + hitVector.x * hitStrength,
+     	y = a.velocity.y / 2 + hitVector.y * hitStrength,
     }
 end
 
@@ -116,14 +113,14 @@ function collide(p, p2)
     }
     local collisionAngle = ( math.vectorToDegree(vecDiff) + 180 ) % 360
     local dirVec = degreeToVector(collisionAngle)
-    
+
     pNew = newVelocity(p, p2)
     p2New = newVelocity(p2, p)
 
     local margin = 1
     p.position.x = p2.position.x + dirVec.x * (p.size + p2.size + margin)
     p.position.y = p2.position.y + dirVec.y * (p.size + p2.size + margin)
-   
+
     p.velocity = pNew
     p2.velocity = p2New
 end
@@ -132,12 +129,12 @@ function update(dt)
     for _,p in pairs(players) do
 	updatePlayer(dt, p)
     end
-    
+
     for _,p in pairs(players) do
 	if p.hasCollided then
 	    goto continue
 	end
-	
+
 	for _,p2 in pairs(players) do
 	    if p == p2 then
 		goto continue
