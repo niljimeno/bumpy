@@ -92,8 +92,8 @@ function newVelocity(a, b)
 
     local collisionAngle = math.vectorToDegree(vecDiff)
     local hitVelocity = {
-	x = b.velocity.x - a.velocity.x,
-	y = b.velocity.y - a.velocity.y,
+	x = b.velocity.x - (a.velocity.x / 2),
+	y = b.velocity.y - (a.velocity.y / 2),
     }
     local hitVelocityDirection = vectorToDegree(hitVelocity)
     local hitStrength = math.hypotenusa(hitVelocity)
@@ -153,7 +153,7 @@ end
 
 function drawWheel(player)
     local vecDir = degreeToVector(player.direction)
-    local distance = 35
+    local distance = player.size * 1.7
     local trianglePosition = {
 	x = player.position.x + vecDir.x * distance,
 	y = player.position.y + vecDir.y * distance
@@ -161,7 +161,7 @@ function drawWheel(player)
 
     local vecB = degreeToVector(player.direction+120)
     local vecC = degreeToVector(player.direction+240)
-    local wheelDiameter = 10
+    local wheelDiameter = player.size / 2
 
     love.graphics.setColor(1, 0.8, 0.4, 1)
     love.graphics.polygon(
