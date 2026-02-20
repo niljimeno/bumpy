@@ -53,11 +53,18 @@ function clamp(value, min, max)
     end
 end
 
+function normalize(value, max, min)
+    min = min or 0
+
+    return (value - min) / (max - min)
+end
+
 return {
     vector = vector,
     lerp = lerp,
     clamp = clamp,
     vectorToDegree = vectorToDegree,
     hypotenusa = hypotenusa,
-    angleDiff = angleDiff
+    angleDiff = angleDiff,
+    normalize = normalize
 }

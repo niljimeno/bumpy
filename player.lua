@@ -116,8 +116,9 @@ function collide(p, p2)
     pNew = newVelocity(p, p2)
     p2New = newVelocity(p2, p)
 
-    p.position.x = p2.position.x + dirVec.x * (p.size + p2.size)
-    p.position.y = p2.position.y + dirVec.y * (p.size + p2.size)
+    local margin = 1
+    p.position.x = p2.position.x + dirVec.x * (p.size + p2.size + margin)
+    p.position.y = p2.position.y + dirVec.y * (p.size + p2.size + margin)
    
     p.velocity = pNew
     p2.velocity = p2New
