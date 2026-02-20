@@ -12,13 +12,18 @@ end
 
 function degreeToVector(deg)
     return vector(
-	math.cos(math.rad(deg)),
-	math.sin(math.rad(deg))
+	math.sin(math.rad(deg)),
+	math.cos(math.rad(deg))
     )
 end
 
+-- this only works in one direction
 function vectorToDegree(vec)
     return math.deg(math.atan2(vec.x, vec.y))
+end
+
+function hypotenusa(vec)
+    return math.abs(math.sqrt(vec.x^2 + vec.y^2))
 end
 
 function distance(vec1, vec2)
@@ -27,7 +32,11 @@ function distance(vec1, vec2)
 	y = vec1.y - vec2.y,
     }
 
-    return math.sqrt(diff.x^2 + diff.y^2)
+    return hypotenusa(diff)
+end
+
+function angleDiff(a, b)
+    return (a - b) % 360
 end
 
 function lerp(a, b, t)
@@ -54,5 +63,8 @@ return {
     vector = vector,
     lerp = lerp,
     clamp = clamp,
+    vectorToDegree = vectorToDegree,
+    hypotenusa = hypotenusa,
+    angleDiff = angleDiff,
     normalize = normalize
 }
