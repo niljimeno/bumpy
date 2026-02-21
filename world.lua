@@ -1,24 +1,24 @@
 local math = require("math")
 local uMath = require("utils.math")
 local Player = require("player")
-local map = require("map")
 
 local World = {}
 
-local players = {}
 local countdown = 5 
 local playingGame = false
 
 function World.load()
     map.load()
+    setupRound()
+    setMapLimits(PLAYER_SIZE)
 end
 
 function World.update(dt)
     handleRoundTransitions(dt)
 end
 
-function World.draw()
-    map.draw()
+function World.draw(offsetX, offsetY)
+    map.draw(offsetX, offsetY)
    
     if not playingGame and countdown < 3 then
         local gameWidth, gameHeight = love.graphics.getDimensions()
@@ -43,7 +43,7 @@ function handleRoundTransitions(dt)
         countdown = countdown - dt
 
         if countdown < 0 then
-            resetRound()
+            setupRound()
 
         elseif countdown < 3 then
             for _, player in pairs(players) do
@@ -66,11 +66,11 @@ function startRound()
     countdown = 5
 end
 
-function resetRound()
+function setupRound()
     print("RESET ROUND")
    
     for i, player in pairs(players) do
-        local spot = world.getSpawnPoint(i)
+        local spot = getSpawnPoint(i)
 
         player.state = Player.State.Frozen
         player.position.x = spot.x

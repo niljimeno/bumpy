@@ -1,12 +1,11 @@
 local math = require("utils.math")
 local luaMath = require("math")
 
-players = {}
-
 local State = {
     Frozen = 0,
     Waiting = 1,
     Running = 2,
+    Dead = 3,
 }
 
 function newPlayer(key, x, y)
@@ -14,21 +13,20 @@ function newPlayer(key, x, y)
 	speed = 2000,
 	key = key,
 	size = 20,
-	
+
 	state = State.Waiting,
 	position = math.vector(x, y),
 	velocity = math.vector(),
 	maxVelocity = 20,
 	direction = 0,
 
-	-- temporaries
 	hasCollided = false,
     }
-    
+
     return instance
 end
 
-function init()
+function init(players)
     table.insert(players, newPlayer("space", 20, 40))
     table.insert(players, newPlayer("a", 100, 250))
 end
@@ -43,9 +41,6 @@ end
 function accelerate(dt, player)
     local change = player.speed * dt
     local directionVector = degreeToVector(player.direction)
-    local degDiff = luaMath.abs(
-	(vectorToDegree(player.velocity) % 360) -
-	(player.direction % 360))
 
     player.velocity.x = player.velocity.x + directionVector.x * change
     player.velocity.y = player.velocity.y + directionVector.y * change
@@ -59,7 +54,7 @@ end
 function spin(dt, player)
     local change = 180
     player.direction = (player.direction + change*dt) % 360
-end 
+end
 
 function updatePlayer(dt, player)
     if (player.state == State.Frozen) then
@@ -92,8 +87,8 @@ function newVelocity(a, b)
 
     local collisionAngle = math.vectorToDegree(vecDiff)
     local hitVelocity = {
-	x = b.velocity.x - a.velocity.x,
-	y = b.velocity.y - a.velocity.y,
+	x = b.velocity.x - (a.velocity.x / 2),
+	y = b.velocity.y - (a.velocity.y / 2),
     }
     local hitVelocityDirection = vectorToDegree(hitVelocity)
     local hitStrength = math.hypotenusa(hitVelocity)
@@ -104,8 +99,8 @@ function newVelocity(a, b)
     -- print("New things", "vel dir", bVelocityDirection, "strength", bStrength, "hit angle diff", bHitAngleDiff, "hitStrength", bHitStrength, "p2 hit angle", bHitAngle, "p2 hit vector", bHitVector.x, bHitVector.y)
 
     return {
-     	x = a.velocity.x + hitVector.x * hitStrength,
-     	y = a.velocity.y + hitVector.y * hitStrength,
+     	x = a.velocity.x / 2 + hitVector.x * hitStrength,
+     	y = a.velocity.y / 2 + hitVector.y * hitStrength,
     }
 end
 
@@ -116,28 +111,30 @@ function collide(p, p2)
     }
     local collisionAngle = ( math.vectorToDegree(vecDiff) + 180 ) % 360
     local dirVec = degreeToVector(collisionAngle)
-    
+
     pNew = newVelocity(p, p2)
     p2New = newVelocity(p2, p)
 
     local margin = 1
     p.position.x = p2.position.x + dirVec.x * (p.size + p2.size + margin)
     p.position.y = p2.position.y + dirVec.y * (p.size + p2.size + margin)
-   
+
     p.velocity = pNew
     p2.velocity = p2New
+
+    camera.screenShake(2, 10, 15)
 end
 
-function update(dt)
+function update(dt, players)
     for _,p in pairs(players) do
 	updatePlayer(dt, p)
     end
-    
+
     for _,p in pairs(players) do
 	if p.hasCollided then
 	    goto continue
 	end
-	
+
 	for _,p2 in pairs(players) do
 	    if p == p2 then
 		goto continue
@@ -151,17 +148,17 @@ function update(dt)
     end
 end
 
-function drawWheel(player)
+function drawWheel(player, offsetX, offsetY)
     local vecDir = degreeToVector(player.direction)
-    local distance = 35
+    local distance = player.size * 1.7
     local trianglePosition = {
-	x = player.position.x + vecDir.x * distance,
-	y = player.position.y + vecDir.y * distance
+	x = player.position.x + offsetX + vecDir.x * distance,
+	y = player.position.y + offsetY + vecDir.y * distance
     }
 
     local vecB = degreeToVector(player.direction+120)
     local vecC = degreeToVector(player.direction+240)
-    local wheelDiameter = 10
+    local wheelDiameter = player.size / 2
 
     love.graphics.setColor(1, 0.8, 0.4, 1)
     love.graphics.polygon(
@@ -176,14 +173,16 @@ function drawWheel(player)
 end
 
 function drawPlayer(player)
-    love.graphics.circle("fill", player.position.x, player.position.y, player.size)
+    local offsetX, offsetY = camera.positionToScreen(0, 0)
+
+    love.graphics.circle("fill", player.position.x + offsetX, player.position.y + offsetY, player.size)
 
     if player.state == State.Waiting then
-	drawWheel(player)
+	drawWheel(player, offsetX, offsetY)
     end
 end
 
-function draw()
+function draw(players)
     for _,p in pairs(players) do
 	drawPlayer(p)
 	p.hasCollided = false
@@ -193,5 +192,6 @@ end
 return {
     init = init,
     update = update,
+    State = State,
     draw = draw,
 }

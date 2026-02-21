@@ -1,5 +1,3 @@
-local camera = require("camera")
-
 local Map = {}
 
 local quads = {}
@@ -62,9 +60,7 @@ function Map.load()
     }
 end
 
-function Map.draw()
-    local offsetX, offsetY = camera.positionToScreen(0, 0)
-
+function Map.draw(offsetX, offsetY)
     for i, row in ipairs(tileset) do
         for j, tile in ipairs(row) do
             love.graphics.draw(
