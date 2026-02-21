@@ -1,3 +1,4 @@
+map = require("map")
 world = require("world")
 player = require("player")
 camera = require("camera")
@@ -13,13 +14,14 @@ function love.load()
 
     world.load()
     player.init()
-    camera.centerOnWorld(world)
+    camera.centerOnWorld(map)
 end
 
 function love.update(dt)
     background.update(dt)
     camera.update(dt)
     player.update(dt)
+    world.update(dt)
 end
 
 function love.draw()

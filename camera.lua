@@ -32,9 +32,9 @@ function Camera.update(dt)
     end
 end
 
-function Camera.centerOnWorld(world)
+function Camera.centerOnWorld(map)
     gameWidth, gameHeight = love.graphics.getDimensions()
-    local mapWidth, mapHeight = world.getMapDimentions()
+    local mapWidth, mapHeight = map.getDimensions()
     
     BASE_OFFSET_Y = (gameHeight - mapHeight) / 2
     BASE_OFFSET_X = (gameWidth - mapWidth) / 2
