@@ -1,8 +1,6 @@
 local math = require("utils.math")
 local luaMath = require("math")
 
-players = {}
-
 local State = {
     Frozen = 0,
     Waiting = 1,
@@ -21,14 +19,13 @@ function newPlayer(key, x, y)
 	maxVelocity = 20,
 	direction = 0,
 
-	-- temporaries
 	hasCollided = false,
     }
 
     return instance
 end
 
-function init()
+function init(players)
     table.insert(players, newPlayer("space", 20, 40))
     table.insert(players, newPlayer("a", 100, 250))
 end
@@ -125,7 +122,7 @@ function collide(p, p2)
     p2.velocity = p2New
 end
 
-function update(dt)
+function update(dt, players)
     for _,p in pairs(players) do
 	updatePlayer(dt, p)
     end
@@ -180,7 +177,7 @@ function drawPlayer(player)
     end
 end
 
-function draw()
+function draw(players)
     for _,p in pairs(players) do
 	drawPlayer(p)
 	p.hasCollided = false
