@@ -3,6 +3,8 @@ player = require("player")
 camera = require("camera")
 background = require("background")
 
+players = {}
+
 function love.load()
     local screenWidth, screenHeight = love.window.getDesktopDimensions(1)
 
@@ -12,18 +14,18 @@ function love.load()
     })
 
     world.load()
-    player.init()
+    player.init(players)
     camera.centerOnWorld(world)
 end
 
 function love.update(dt)
     background.update(dt)
     camera.update(dt)
-    player.update(dt)
+    player.update(dt, players)
 end
 
 function love.draw()
     background.draw()
     world.draw()
-    player.draw()
+    player.draw(players)
 end
