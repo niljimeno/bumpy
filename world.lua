@@ -1,109 +1,136 @@
+local math = require("math")
 local uMath = require("utils.math")
-local camera = require("camera")
+local Player = require("player")
+
+local MAX_SCORE = 5
+
 local World = {}
 
-local tilemap
-local tileset
-local quads = {}
-local width, height
-
-local spawnPoint = {
-    {x = 128, y = 128, dir = 45 },
-    {x = 512, y = 512, dir = 225},
-    {x = 512, y = 128, dir = 135},
-    {x = 128, y = 512, dir = 315},
-}
-
-local spawnPointAlt = { -- FOR 3 PLAYERS
-    {x = 320, y = 128, dir = 90 },
-    {x = 512, y = 512, dir = 225},
-    {x = 128, y = 512, dir = 315},
-}
-
-local mapLimits = {
-    min = 0,
-    max = 640
-}
+local countdown = 5 
+local gameOver = false
+local playingGame = false
 
 function World.load()
-    tilemap = love.graphics.newImage("assets/map.png")
+    map.load()
+    setupRound()
+    setMapLimits(PLAYER_SIZE)
+end
 
-    local mapHeight = tilemap:getHeight()
-    local mapWidth = tilemap:getWidth()
-    height = mapHeight / 4
-    width = mapWidth / 3
+function World.update(dt)
+    handleRoundTransitions(dt)
+end
 
-    for i = 1, 4 do
-        for j = 1, 3 do
-            table.insert(quads,
-                love.graphics.newQuad(
-                    (j - 1) * width, (i - 1) * height,
-                    width, height,
-                    mapWidth, mapHeight
-                ))
-        end
+function World.draw(offsetX, offsetY)
+    map.draw(offsetX, offsetY)
+   
+    if not playingGame and countdown < 3 then
+        local gameWidth, gameHeight = love.graphics.getDimensions()
+        love.graphics.print(math.ceil(countdown), gameWidth / 2, gameHeight / 2)
+    end
+end
+
+function handleRoundTransitions(dt)
+    local playersAlive = countPlayersAlive()
+
+    if gameOver then return end
+
+    if not playingGame then
+        countdown = countdown - dt
+
+        if countdown < 0 then
+            startRound()
+        end    
+
+        return
     end
 
-    tileset = {
-        {1 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 3 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {7 , 8 , 8 , 8 , 8 , 8 , 8 , 8 , 8 , 9 },
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-    }
+    if playersAlive > 1 then return end
 
+    countdown = countdown - dt
+
+    if countdown < 0 then
+        setupRound()
+
+    elseif countdown < 3 then
+        for _, player in pairs(players) do
+            if player.state == Player.State.Waiting or player.state == Player.State.Running then
+                player.state = Player.State.Frozen
+                player.score = player.score + 1
+
+                if player.score >= MAX_SCORE then
+                    gameOver = true
+                end
+            end
+        end
+    end
+end
+
+function startRound()
+    print("START ROUND")
     
+    for i, player in pairs(players) do
+        player.state = Player.State.Waiting
+    end
+    
+    playingGame = true
+    countdown = 5
 end
 
-function World.draw()
-    local offsetX, offsetY = camera.positionToScreen(0, 0)
-    for i, row in ipairs(tileset) do
-        for j, tile in ipairs(row) do
-            love.graphics.draw(
-                tilemap,
-                quads[tile],
-                offsetX + (j - 1) * width,
-                offsetY + (i - 1) * height
-            )
+function setupRound()
+    print("RESET ROUND")
+   
+    for i, player in pairs(players) do
+        local spot = getSpawnPoint(i)
+
+        player.state = Player.State.Frozen
+        player.position.x = spot.x
+        player.position.y = spot.y
+        player.direction = spot.dir
+	    player.velocity = uMath.vector()
+    end
+    
+    playingGame = false
+    countdown = 5
+end
+
+function countPlayersAlive()
+    local total = 0
+    
+    for _, player in pairs(players) do
+        if not isOnFloor(player.position.x, player.position.y) and player.state ~= Player.State.Dead then
+            player.state = Player.State.Dead
+            print("player ded")
+        end
+
+        if player.state ~= Player.State.Dead then
+            total = total + 1
         end
     end
+
+    return total
 end
 
-function World.isOnFloor(x, y)
-    if x <= mapLimits.min then return false end
-    if x >= mapLimits.max then return false end
-    if y <= mapLimits.min then return false end
-    if y >= mapLimits.max then return false end
+function isOnFloor(x, y)
+    if x <= map.limits.min then return false end
+    if x >= map.limits.max then return false end
+    if y <= map.limits.min then return false end
+    if y >= map.limits.max then return false end
 
     return true
 end
 
-function World.setMapLimits(playerSize)
-    mapLimits.min = mapLimits.min - playerSize
-    mapLimits.max = mapLimits.max + playerSize
+function setMapLimits(playerSize)
+    map.limits.min = map.limits.min - playerSize
+    map.limits.max = map.limits.max + playerSize
 end
 
-function World.getMapDimentions()
-    return #tileset[1] * width, #tileset[1] * height
-end
-
-function World.getSpawnPoint(index, alt)
+function getSpawnPoint(index, alt)
     alt = alt or false
 
     if not alt then
-        return spawnPoint[index]
+        return map.spawnPoint[index]
     else
-        return spawnPointAlt[index]
+        return map.spawnPointAlt[index]
     end
 end
 

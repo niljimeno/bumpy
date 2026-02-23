@@ -5,6 +5,7 @@ local State = {
     Frozen = 0,
     Waiting = 1,
     Running = 2,
+    Dead = 3,
 }
 
 function newPlayer(key, x, y)
@@ -12,7 +13,8 @@ function newPlayer(key, x, y)
 	speed = 2000,
 	key = key,
 	size = 20,
-
+    
+    score = 0,
 	state = State.Waiting,
 	position = math.vector(x, y),
 	velocity = math.vector(),
@@ -120,6 +122,8 @@ function collide(p, p2)
 
     p.velocity = pNew
     p2.velocity = p2New
+
+    camera.screenShake(2, 10, 15)
 end
 
 function update(dt, players)
@@ -145,12 +149,12 @@ function update(dt, players)
     end
 end
 
-function drawWheel(player)
+function drawWheel(player, offsetX, offsetY)
     local vecDir = degreeToVector(player.direction)
     local distance = player.size * 1.7
     local trianglePosition = {
-	x = player.position.x + vecDir.x * distance,
-	y = player.position.y + vecDir.y * distance
+	x = player.position.x + offsetX + vecDir.x * distance,
+	y = player.position.y + offsetY + vecDir.y * distance
     }
 
     local vecB = degreeToVector(player.direction+120)
@@ -170,10 +174,12 @@ function drawWheel(player)
 end
 
 function drawPlayer(player)
-    love.graphics.circle("fill", player.position.x, player.position.y, player.size)
+    local offsetX, offsetY = camera.positionToScreen(0, 0)
+
+    love.graphics.circle("fill", player.position.x + offsetX, player.position.y + offsetY, player.size)
 
     if player.state == State.Waiting then
-	drawWheel(player)
+	drawWheel(player, offsetX, offsetY)
     end
 end
 
@@ -187,5 +193,6 @@ end
 return {
     init = init,
     update = update,
+    State = State,
     draw = draw,
 }

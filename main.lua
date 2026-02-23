@@ -1,7 +1,10 @@
+map = require("map")
 world = require("world")
 player = require("player")
 camera = require("camera")
 background = require("background")
+
+PLAYER_SIZE = 20
 
 players = {}
 
@@ -13,19 +16,22 @@ function love.load()
         vsync = true
     })
 
-    world.load()
     player.init(players)
-    camera.centerOnWorld(world)
+    world.load()
+    camera.centerOnWorld(map)
 end
 
 function love.update(dt)
+    player.update(dt, players)
     background.update(dt)
     camera.update(dt)
-    player.update(dt, players)
+    world.update(dt)
 end
 
 function love.draw()
+    local offsetX, offsetY = camera.positionToScreen(0, 0)
+    
     background.draw()
-    world.draw()
+    world.draw(offsetX, offsetY)
     player.draw(players)
 end
