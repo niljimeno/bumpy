@@ -2,9 +2,12 @@ local math = require("math")
 local uMath = require("utils.math")
 local Player = require("player")
 
+local MAX_SCORE = 5
+
 local World = {}
 
 local countdown = 5 
+local gameOver = false
 local playingGame = false
 
 function World.load()
@@ -29,6 +32,8 @@ end
 function handleRoundTransitions(dt)
     local playersAlive = countPlayersAlive()
 
+    if gameOver then return end
+
     if not playingGame then
         countdown = countdown - dt
 
@@ -39,16 +44,21 @@ function handleRoundTransitions(dt)
         return
     end
 
-    if playingGame and playersAlive <= 1 then
-        countdown = countdown - dt
+    if playersAlive > 1 then return end
 
-        if countdown < 0 then
-            setupRound()
+    countdown = countdown - dt
 
-        elseif countdown < 3 then
-            for _, player in pairs(players) do
-                if player.state == Player.State.Waiting or player.state == Player.State.Running then
-                    player.state = Player.State.Frozen
+    if countdown < 0 then
+        setupRound()
+
+    elseif countdown < 3 then
+        for _, player in pairs(players) do
+            if player.state == Player.State.Waiting or player.state == Player.State.Running then
+                player.state = Player.State.Frozen
+                player.score = player.score + 1
+
+                if player.score >= MAX_SCORE then
+                    gameOver = true
                 end
             end
         end

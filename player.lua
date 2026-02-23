@@ -13,7 +13,8 @@ function newPlayer(key, x, y)
 	speed = 2000,
 	key = key,
 	size = 20,
-
+    
+    score = 0,
 	state = State.Waiting,
 	position = math.vector(x, y),
 	velocity = math.vector(),
