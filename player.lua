@@ -16,6 +16,7 @@ function newPlayer(key, x, y)
     
     score = 0,
 	state = State.Waiting,
+    scale = math.vector(1, 1),
 	position = math.vector(x, y),
 	velocity = math.vector(),
 	maxVelocity = 20,
@@ -58,7 +59,10 @@ function spin(dt, player)
 end
 
 function updatePlayer(dt, player)
-    if (player.state == State.Frozen) then
+    if (player.state == State.Dead) then
+        decelerate(dt, player)
+
+    elseif (player.state == State.Frozen) then
 	decelerate(dt, player)
     elseif (love.keyboard.isDown(player.key)) then
 	accelerate(dt, player)
@@ -84,7 +88,6 @@ function newVelocity(a, b)
 	    x = b.position.x - a.position.x,
 	    y = b.position.y - a.position.y,
     }
-
 
     local collisionAngle = math.vectorToDegree(vecDiff)
     local hitVelocity = {
@@ -123,7 +126,7 @@ function collide(p, p2)
     p.velocity = pNew
     p2.velocity = p2New
 
-    camera.screenShake(2, 10, 15)
+    camera.screenShake(1, 15, 20)
 end
 
 function update(dt, players)
@@ -175,9 +178,35 @@ end
 
 function drawPlayer(player)
     local offsetX, offsetY = camera.positionToScreen(0, 0)
+    local playerSpeed = luaMath.abs(player.velocity.x) + luaMath.abs(player.velocity.y)
+    local interval = math.normalize(playerSpeed, 1000)
+    
+    if player.hasCollided then
+        player.scale.y = 0.2
+        player.scale.x = 1.8
 
-    love.graphics.circle("fill", player.position.x + offsetX, player.position.y + offsetY, player.size)
+    elseif player.state == State.Running then
+        player.scale.y = math.lerp(player.scale.y, math.clamp(1 + interval, 1, 1.5), 0.1)
+        player.scale.x = math.lerp(player.scale.x, math.clamp(1 - interval, 0.5, 1), 0.1)
 
+    else
+        player.scale.x = math.lerp(player.scale.x, 1, 0.05)
+        player.scale.y = math.lerp(player.scale.y, 1, 0.05)
+
+    end                 
+
+    love.graphics.push()
+
+    love.graphics.translate(player.position.x + offsetX,
+                            player.position.y + offsetY)
+
+    love.graphics.rotate(-luaMath.rad(player.direction))
+    love.graphics.scale(player.scale.x, player.scale.y)
+
+    love.graphics.circle("fill", 0, 0, player.size)
+
+    love.graphics.pop()
+    
     if player.state == State.Waiting then
 	drawWheel(player, offsetX, offsetY)
     end
