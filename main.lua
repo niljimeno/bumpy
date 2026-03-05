@@ -29,9 +29,6 @@ function love.update(dt)
 end
 
 function love.draw()
-    local offsetX, offsetY = camera.positionToScreen(0, 0)
-    
     background.draw()
-    world.draw(offsetX, offsetY)
-    player.draw(players)
+    world.draw(players)
 end

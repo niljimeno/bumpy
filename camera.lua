@@ -34,10 +34,9 @@ end
 
 function Camera.centerOnWorld(map)
     gameWidth, gameHeight = love.graphics.getDimensions()
-    local mapWidth, mapHeight = map.getDimensions()
     
-    BASE_OFFSET_Y = (gameHeight - mapHeight) / 2
-    BASE_OFFSET_X = (gameWidth - mapWidth) / 2
+    BASE_OFFSET_Y = (gameHeight - map.limits.max) / 2
+    BASE_OFFSET_X = (gameWidth - map.limits.max) / 2
 
     screenOffsetY = BASE_OFFSET_Y
     screenOffsetX = BASE_OFFSET_X

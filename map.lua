@@ -1,9 +1,5 @@
 local Map = {}
 
-local quads = {}
-local width, height
-local tileset, tilemap
-
 Map.limits = {
     min = 0,
     max = 640
@@ -22,59 +18,18 @@ Map.spawnPointAlt = { -- FOR 3 PLAYERS
     {x = 128, y = 512, dir = 315},
 }
 
-function Map.load()
-    tilemap = love.graphics.newImage("assets/map.png")
-
-    local mapHeight = tilemap:getHeight()
-    local mapWidth = tilemap:getWidth()
-    height = mapHeight / 4
-    width = mapWidth / 3
-
-    for i = 1, 4 do
-        for j = 1, 3 do
-            table.insert(quads,
-                love.graphics.newQuad(
-                    (j - 1) * width, (i - 1) * height,
-                    width, height,
-                    mapWidth, mapHeight
-                ))
-        end
-    end
-
-    tileset = {
-        {1 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 3 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {4 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 6 },
-        {7 , 8 , 8 , 8 , 8 , 8 , 8 , 8 , 8 , 9 },
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-        {10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-    }
+function Map.drawField(offsetX, offsetY)
+    love.graphics.push("all")
+    love.graphics.setColor(0.1, 0.3, 0.65, 1)
+    love.graphics.rectangle("fill", offsetX, offsetY, Map.limits.max, Map.limits.max)
+    love.graphics.pop()
 end
 
-function Map.draw(offsetX, offsetY)
-    for i, row in ipairs(tileset) do
-        for j, tile in ipairs(row) do
-            love.graphics.draw(
-                tilemap,
-                quads[tile],
-                offsetX + (j - 1) * width,
-                offsetY + (i - 1) * height
-            )
-        end
-    end
-end
-
-function Map.getDimensions()
-    return #tileset[1] * width, #tileset[1] * height
+function Map.drawCliff(offsetX, offsetY)
+    love.graphics.push("all")
+    love.graphics.setColor(0.1, 0.2, 0.3, 1)
+    love.graphics.rectangle("fill", offsetX, offsetY + 200, Map.limits.max, Map.limits.max)
+    love.graphics.pop()
 end
 
 return Map

@@ -11,7 +11,6 @@ local gameOver = false
 local playingGame = false
 
 function World.load()
-    map.load()
     setupRound()
     setMapLimits(PLAYER_SIZE)
 end
@@ -20,8 +19,13 @@ function World.update(dt)
     handleRoundTransitions(dt)
 end
 
-function World.draw(offsetX, offsetY)
-    map.draw(offsetX, offsetY)
+function World.draw(players)
+    local offsetX, offsetY = camera.positionToScreen(0, 0)
+
+    map.drawCliff(offsetX, offsetY)
+    Player.drawFalling(players)
+    map.drawField(offsetX, offsetY)
+    Player.draw(players)
    
     if not playingGame and countdown < 3 then
         local gameWidth, gameHeight = love.graphics.getDimensions()
@@ -97,12 +101,12 @@ function countPlayersAlive()
     local total = 0
     
     for _, player in pairs(players) do
-        if not isOnFloor(player.position.x, player.position.y) and player.state ~= Player.State.Dead then
-            player.state = Player.State.Dead
+        if not isOnFloor(player.position.x, player.position.y) and player.state ~= Player.State.Falling then
+            player.state = Player.State.Falling
             print("player ded")
         end
 
-        if player.state ~= Player.State.Dead then
+        if player.state ~= Player.State.Falling then
             total = total + 1
         end
     end
