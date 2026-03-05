@@ -5,7 +5,7 @@ local State = {
     Frozen = 0,
     Waiting = 1,
     Running = 2,
-    Dead = 3,
+    Falling = 3,
 }
 
 function newPlayer(key, x, y)
@@ -59,7 +59,7 @@ function spin(dt, player)
 end
 
 function updatePlayer(dt, player)
-    if (player.state == State.Dead) then
+    if (player.state == State.Falling) then
         decelerate(dt, player)
 
     elseif (player.state == State.Frozen) then
@@ -182,12 +182,17 @@ function drawPlayer(player)
     local interval = math.normalize(playerSpeed, 1000)
     
     if player.hasCollided then
-        player.scale.y = 0.2
-        player.scale.x = 1.8
+        player.scale.y = 0.4
+        player.scale.x = 1.6
 
     elseif player.state == State.Running then
-        player.scale.y = math.lerp(player.scale.y, math.clamp(1 + interval, 1, 1.5), 0.1)
-        player.scale.x = math.lerp(player.scale.x, math.clamp(1 - interval, 0.5, 1), 0.1)
+        player.scale.y = math.lerp(player.scale.y, math.clamp(1 + interval, 1, 1.3), 0.1)
+        player.scale.x = math.lerp(player.scale.x, math.clamp(1 - interval, 0.7, 1), 0.1)
+
+    elseif player.state == State.Falling then
+        player.position.y = player.position.y + 1
+        player.scale.y = math.lerp(player.scale.y, 0, 0.01)
+        player.scale.x = math.lerp(player.scale.x, 0, 0.01)
 
     else
         player.scale.x = math.lerp(player.scale.x, 1, 0.05)
@@ -212,10 +217,21 @@ function drawPlayer(player)
     end
 end
 
+function drawFalling(players)
+    for _,p in pairs(players) do
+        if p.state == State.Falling then
+            drawPlayer(p)
+	        p.hasCollided = false
+        end
+    end
+end
+
 function draw(players)
     for _,p in pairs(players) do
-	drawPlayer(p)
-	p.hasCollided = false
+        if p.state ~= State.Falling then
+	        drawPlayer(p)
+	        p.hasCollided = false
+        end
     end
 end
 
@@ -224,4 +240,5 @@ return {
     update = update,
     State = State,
     draw = draw,
+    drawFalling = drawFalling
 }
