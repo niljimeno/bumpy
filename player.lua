@@ -80,6 +80,10 @@ function updatePlayer(dt, player)
 end
 
 function areColliding(a, b)
+    if a.state == State.Falling or b.state == State.Falling then
+        return false
+    end
+
     return distance(a.position, b.position) < (a.size + b.size)
 end
 
