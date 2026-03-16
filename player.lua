@@ -10,19 +10,19 @@ local State = {
 
 function newPlayer(key, x, y)
     local instance = {
-	speed = 2000,
-	key = key,
-	size = 20,
-    
-    score = 0,
-	state = State.Waiting,
-    scale = math.vector(1, 1),
-	position = math.vector(x, y),
-	velocity = math.vector(),
-	maxVelocity = 20,
-	direction = 0,
+        speed = 2000,
+        key = key,
+        size = 20,
 
-	hasCollided = false,
+        score = 0,
+        state = State.Waiting,
+        scale = math.vector(1, 1),
+        position = math.vector(x, y),
+        velocity = math.vector(),
+        maxVelocity = 20,
+        direction = 0,
+
+        hasCollided = false,
     }
 
     return instance
@@ -149,6 +149,7 @@ function update(dt, players)
 	    end
 	    if areColliding(p, p2) then
 		collide(p, p2)
+		p.hasCollided = true
 		p2.hasCollided = true
 	    end
 	end
@@ -184,7 +185,7 @@ function drawPlayer(player)
     local offsetX, offsetY = camera.positionToScreen(0, 0)
     local playerSpeed = luaMath.abs(player.velocity.x) + luaMath.abs(player.velocity.y)
     local interval = math.normalize(playerSpeed, 1000)
-    
+
     if player.hasCollided then
         player.scale.y = 0.4
         player.scale.x = 1.6
@@ -202,7 +203,7 @@ function drawPlayer(player)
         player.scale.x = math.lerp(player.scale.x, 1, 0.05)
         player.scale.y = math.lerp(player.scale.y, 1, 0.05)
 
-    end                 
+    end
 
     love.graphics.push()
 
@@ -215,7 +216,7 @@ function drawPlayer(player)
     love.graphics.circle("fill", 0, 0, player.size)
 
     love.graphics.pop()
-    
+
     if player.state == State.Waiting then
 	drawWheel(player, offsetX, offsetY)
     end

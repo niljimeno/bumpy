@@ -5,6 +5,8 @@ Map.limits = {
     max = 640
 }
 
+Map.playerLimits = {}
+
 Map.spawnPoint = {
     {x = 128, y = 128, dir = 45 },
     {x = 512, y = 512, dir = 225},
